@@ -1,10 +1,25 @@
 //
-//  SSASideMenu.swift
-//  SSASideMenuExample
-//
-//  Created by Sebastian Andersen on 06/10/14.
-//  Copyright (c) 2015 Sebastian Andersen. All rights reserved.
-//
+/**
+ * @file      SSASideMenu.swift
+ * @brief
+ * @details
+ * @see
+ * @author    Shrinivas Uttamrao Gutte, shrinivasgutte@elear.solutions
+ * @copyright Copyright (c) 2019 Elear Solutions Tech Private Limited.
+ *            All rights reserved.
+ * @license   To any person (the "Recipient") obtaining a copy of this software
+ *            and associated documentation files (the "Software"):
+ *            All information contained in or disclosed by this software is
+ *            confidential and proprietary information of Elear Solutions Tech
+ *            Private Limited and all rights therein are expressly reserved.
+ *            By accepting this material the recipient agrees that this material
+ *            and the information contained therein is held in confidence and
+ *            in trust and will NOT be used, copied, modified, merged,
+ *            published, distributed, sublicensed, reproduced in whole or
+ *            in part, nor its contents revealed in any manner to others
+ *            without the express written permission of Elear Solutions Tech
+ *            Private Limited.
+ */
 
 import Foundation
 import UIKit
@@ -25,12 +40,15 @@ extension UIViewController {
                 return getSideViewController(parent)
             }
         }
+      print("return nil ::  ")
         return nil
     }
     
     @IBAction func presentLeftMenuViewController() {
-        
-        sideMenuViewController?._presentLeftMenuViewController()
+        DispatchQueue.main.async {
+          print("presentLeftMenuViewController :::::::")
+            self.sideMenuViewController?._presentLeftMenuViewController()
+        }
     }
     
     @IBAction func presentRightMenuViewController() {
@@ -203,7 +221,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
     @IBInspectable var bouncesHorizontally: Bool = true
     
     // MARK : Public Properties: MenuView
-    @IBInspectable var statusBarStyle: SSAStatusBarStyle = .black
+    var statusBarStyle: SSAStatusBarStyle = .black
     
     // MARK : Private Properties: ContentView
     @IBInspectable var contentViewScaleValue: Float = 0.7
@@ -227,8 +245,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
     // MARK : Public Properties: SideMenu
     @IBInspectable var animationDuration: Float = 0.35
     @IBInspectable var panGestureEnabled: Bool = true
-    @IBInspectable var panDirection: SSASideMenuPanDirection = .edge
-    @IBInspectable var type: SSASideMenuType = .scale
+     var panDirection: SSASideMenuPanDirection = .edge
+     var type: SSASideMenuType = .scale
     @IBInspectable var panMinimumOpenThreshold: UInt = 60
     @IBInspectable var menuViewControllerTransformation: CGAffineTransform = CGAffineTransform(scaleX: 1.5, y:1.5)
     @IBInspectable var backgroundTransformation: CGAffineTransform = CGAffineTransform(scaleX: 1.7, y:1.7)
@@ -285,7 +303,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
                 hideViewController(controller)
             }
             setupMenuViewControllerMotionEffects()
-            view.bringSubview(toFront: contentViewContainer)
+            view.bringSubviewToFront(contentViewContainer)
         }
     }
     
@@ -298,7 +316,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
                 hideViewController(controller)
             }
             setupMenuViewControllerMotionEffects()
-            view.bringSubview(toFront: contentViewContainer)
+            view.bringSubviewToFront(contentViewContainer)
         }
     }
     
@@ -336,6 +354,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
     //MARK : Present / Hide Menu ViewControllers
     
     func _presentLeftMenuViewController() {
+
+      print("_presentLeftMenuViewController :::::::")
         presentMenuViewContainerWithMenuViewController(leftMenuViewController)
         showLeftMenuViewController()
     }
@@ -345,7 +365,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
         showRightMenuViewController()
     }
     
-    func hideMenuViewController() {
+    @objc func hideMenuViewController() {
         hideMenuViewController(true)
     }
     
@@ -408,8 +428,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
         
         if endAllEditing {
             view.window?.endEditing(true)
-        }else {
-            setupUserInteractionForContentButtonAndTargetViewControllerView(true, targetViewControllerViewInteractive: false)
+        } else { setupUserInteractionForContentButtonAndTargetViewControllerView(true, targetViewControllerViewInteractive: false)
         }
         
         setupContentButton()
@@ -417,6 +436,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
         resetContentViewScale()
         
         UIApplication.shared.beginIgnoringInteractionEvents()
+       // view.isUserInteractionEnabled = false
     }
     
     
@@ -432,7 +452,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
             let centerXLandscape = CGFloat(contentViewInLandscapeOffsetCenterX) + (iOS8 ? CGFloat(view.frame.width) : CGFloat(view.frame.height))
             let centerXPortrait = CGFloat(contentViewInPortraitOffsetCenterX) + CGFloat(view.frame.width)
             
-            let centerX = UIInterfaceOrientationIsLandscape(UIApplication.shared.statusBarOrientation) ?  centerXLandscape : centerXPortrait
+            let orientation = UIApplication.shared.statusBarOrientation
+            let centerX = orientation.isLandscape ?  centerXLandscape : centerXPortrait
             
             contentViewContainer.center = CGPoint(x: centerX, y: contentViewContainer.center.y)
             // contentViewContainer.frame.origin.x = self.view.frame.width * 0.75
@@ -442,7 +463,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
             let centerXLandscape = -CGFloat(self.contentViewInLandscapeOffsetCenterX)
             let centerXPortrait = CGFloat(-self.contentViewInPortraitOffsetCenterX)
             
-            let centerX = UIInterfaceOrientationIsLandscape(UIApplication.shared.statusBarOrientation) ? centerXLandscape : centerXPortrait
+            let orientation = UIApplication.shared.statusBarOrientation
+            let centerX = orientation.isLandscape ?  centerXLandscape : centerXPortrait
             
             contentViewContainer.center = CGPoint.init(x: centerX, y: contentViewContainer.center.y)
         }
@@ -485,6 +507,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
     }
     
     fileprivate func presentMenuViewContainerWithMenuViewController(_ menuViewController: UIViewController?) {
+      
+      print("presentMenuViewContainerWithMenuViewController ::::: ")
         
         menuViewContainer.transform = CGAffineTransform.identity
         menuViewContainer.frame = view.bounds
@@ -612,8 +636,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
         
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         
-        menuViewContainer.frame = view.bounds;
-        menuViewContainer.autoresizingMask = [.flexibleWidth, .flexibleHeight];
+        menuViewContainer.frame = view.bounds
+        menuViewContainer.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         menuViewContainer.alpha = fadeMenuView ? 0 : 1
         
         contentViewContainer.frame = view.bounds
@@ -635,8 +659,8 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
                 backgroundImageView.transform = backgroundTransformation
             }
             backgroundImageView.frame = view.bounds
-            backgroundImageView.contentMode = .scaleAspectFill;
-            backgroundImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight];
+            backgroundImageView.contentMode = .scaleAspectFill
+            backgroundImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             view.addSubview(backgroundImageView)
         }
         
@@ -653,18 +677,18 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
     fileprivate func setupViewController(_ targetView: UIView, targetViewController: UIViewController?) {
         if let viewController = targetViewController {
             
-            addChildViewController(viewController)
+            addChild(viewController)
             viewController.view.frame = view.bounds
             viewController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             targetView.addSubview(viewController.view)
-            viewController.didMove(toParentViewController: self)
+            viewController.didMove(toParent: self)
         }
     }
     
     fileprivate func hideViewController(_ targetViewController: UIViewController) {
-        targetViewController.willMove(toParentViewController: nil)
+        targetViewController.willMove(toParent: nil)
         targetViewController.view.removeFromSuperview()
-        targetViewController.removeFromParentViewController()
+        targetViewController.removeFromParent()
     }
     
     // MARK : Layout
@@ -675,7 +699,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
             return
         } else {
             contentButton.addTarget(self, action: #selector(SSASideMenu.hideMenuViewController as (SSASideMenu) -> () -> ()), for:.touchUpInside)
-            contentButton.autoresizingMask = UIViewAutoresizing()
+            contentButton.autoresizingMask = UIView.AutoresizingMask()
             contentButton.frame = contentViewContainer.bounds
             contentButton.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             contentButton.tag = 101
@@ -817,16 +841,17 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
                 let centerXLandscape = CGFloat(contentViewInLandscapeOffsetCenterX) + (iOS8 ? CGFloat(view.frame.width) : CGFloat(view.frame.height))
                 let centerXPortrait = CGFloat(contentViewInPortraitOffsetCenterX) + CGFloat(view.frame.width)
                 
-                let centerX = UIInterfaceOrientationIsLandscape(UIApplication.shared.statusBarOrientation) ?  centerXLandscape : centerXPortrait
+                let orientation = UIApplication.shared.statusBarOrientation
+                let centerX = orientation.isLandscape ?  centerXLandscape : centerXPortrait
                 
                 center = CGPoint.init(x: centerX, y: contentViewContainer.center.y)
                 
             } else {
-                
                 let centerXLandscape = -CGFloat(self.contentViewInLandscapeOffsetCenterX)
                 let centerXPortrait = CGFloat(-self.contentViewInPortraitOffsetCenterX)
                 
-                let centerX = UIInterfaceOrientationIsLandscape(UIApplication.shared.statusBarOrientation) ? centerXLandscape : centerXPortrait
+                let orientation = UIApplication.shared.statusBarOrientation
+                let centerX = orientation.isLandscape ?  centerXLandscape : centerXPortrait
                 
                 center = CGPoint.init(x: centerX, y: contentViewContainer.center.y)
             }
@@ -929,7 +954,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
         return true
     }
     
-    func panGestureRecognized(_ recognizer: UIPanGestureRecognizer) {
+    @objc func panGestureRecognized(_ recognizer: UIPanGestureRecognizer) {
         
         delegate?.sideMenuDidRecognizePanGesture?(self, recongnizer: recognizer)
         
@@ -971,7 +996,7 @@ class SSASideMenu: UIViewController, UIGestureRecognizerDelegate {
                 delta = point.x / view.frame.size.width
             }
             
-            delta = min(fabs(delta), 1.6)
+            delta = min(abs(delta), 1.6)
             
             var contentViewScale: CGFloat = type == .scale ? 1 - ((1 - CGFloat(contentViewScaleValue)) * delta) : 1
             
